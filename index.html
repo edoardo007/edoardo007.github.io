@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edoardo Marelli | Fluid Dynamics & Software Engineer</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--accent);
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .bio {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 680px;
+        }
+
+        .links {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            text-decoration: none;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            border-left: 3px solid var(--accent);
+            padding-left: 0.75rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .card p, .card ul {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .card ul {
+            list-style-type: none;
+        }
+
+        .card ul li {
+            margin-bottom: 0.4rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .card ul li::before {
+            content: "•";
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+        }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .tag {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Edoardo Marelli</h1>
+            <div class="subtitle">Fluid Dynamics & Software Engineer at SumToZero</div>
+            <p class="bio">
+                Specialising in aerodynamics, hydrodynamics, computational fluid dynamics (CFD), and structural modelling for high-performance sailing applications. Aerospace Engineering graduate from TU Delft with a passion for bringing computational precision to yacht design.
+            </p>
+            <div class="links">
+                <a href="https://www.linkedin.com/in/edoardo-marelli-bba512158/" class="btn" target="_blank">LinkedIn</a>
+                <a href="https://github.com" class="btn" target="_blank">GitHub</a>
+                <a href="mailto:edo8323@gmail.com" class="btn">Email</a>
+            </div>
+        </header>
+
+        <section>
+            <h2>Current Focus</h2>
+            <div class="card">
+                <h3>SumToZero — Simulation Software for Yacht Design</h3>
+                <p>Developing numerical models and structural tools for high-performance marine applications:</p>
+                <ul style="margin-top: 0.5rem;">
+                    <li>Fluid-Structure Interaction (FSI) structural modelling for hydrofoil calculations.</li>
+                    <li>Mesh processing & STL hull reading features for simulation toolchains.</li>
+                    <li>Consultancy and performance analysis for marine racing designs.</li>
+                </ul>
+                <div class="tag-container">
+                    <span class="tag">C++</span>
+                    <span class="tag">CFD</span>
+                    <span class="tag">FSI</span>
+                    <span class="tag">OpenFOAM</span>
+                    <span class="tag">Python</span>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Technical Capabilities</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>CFD & Fluid Mechanics</h3>
+                    <ul>
+                        <li>Ansys Fluent & CFX (VoF, Turbulence)</li>
+                        <li>OpenFOAM & Potential Flow Solvers</li>
+                        <li>Wind Tunnel Testing & Data Processing</li>
+                        <li>Aerodynamic & Hydrodynamic Optimisation</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Software & Tools</h3>
+                    <ul>
+                        <li>C++ (Object-Oriented Programming)</li>
+                        <li>Python & MATLAB</li>
+                        <li>LaTeX & Technical Documentation</li>
+                        <li>SolidWorks & CAD/CAM</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Education</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>MSc Aerodynamics</h3>
+                    <p><strong>TU Delft</strong> (2022 – 2025)</p>
+                    <p style="margin-top: 0.5rem;">Thesis: Global optimisation algorithms for goal-oriented reduced order models in turbulent flow using C++.</p>
+                </div>
+                <div class="card">
+                    <h3>BEng Aerospace Engineering</h3>
+                    <p><strong>University of the West of England</strong> (First Class, 2022)</p>
+                    <p style="margin-top: 0.5rem;">Core focus on flight dynamics, structures, and fundamental aerodynamics.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Beyond Engineering</h2>
+            <div class="card">
+                <p>When not running simulations, I am usually on or above the water:</p>
+                <ul style="margin-top: 0.5rem;">
+                    <li><strong>Competitive Sailing & Coaching:</strong> Lake Garda roots, experienced across Optimist, 420, 49er, and J70 classes. Former captain and skipper at Delft Challenge.</li>
+                    <li><strong>Aviation:</strong> Licensed Microlight / Ultralight Pilot.</li>
+                    <li><strong>Outdoors & Volunteering:</strong> Civil protection diving volunteer, skier, and mountain biker.</li>
+                </ul>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; Edoardo Marelli. Hosted on GitHub Pages.</p>
+        </footer>
+    </div>
+
+</body>
+</html>

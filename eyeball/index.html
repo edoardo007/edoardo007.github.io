@@ -18,7 +18,7 @@
             <p class="bio">
                 Each round shows a random scatter plot. Estimate one property of its
                 least-squares line by eye, type it in, and see how close you got.
-                Five rounds per game, up to 100 points per estimate.
+                Three rounds per game, up to 100 points per estimate.
             </p>
         </header>
 
@@ -50,6 +50,18 @@
                             <span>Custom</span></label>
                     </div>
                     <p id="level-help" class="help"></p>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Line preview</legend>
+                    <div class="pills">
+                        <label><input type="checkbox" id="preview">
+                            <span>Show my line while I type</span></label>
+                    </div>
+                    <p class="help">
+                        Draws the line from your slope or intercept as soon as you type a
+                        number, so you can match it to the points before you confirm.
+                    </p>
                 </fieldset>
 
                 <fieldset id="custom-options" hidden>

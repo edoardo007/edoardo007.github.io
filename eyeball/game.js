@@ -1,6 +1,6 @@
 'use strict';
 
-const ROUNDS = 5;
+const ROUNDS = 3;
 const SLOPE_ZERO_DEG = 15;      // slope error (degrees on screen) that scores zero
 const INTERCEPT_ZERO_FRAC = 0.1; // intercept error, as a fraction of the plotted y range
 const R2_ZERO = 0.2;            // absolute R² error that scores zero
@@ -65,7 +65,9 @@ const state = {
     round: null,
     revealed: false,
     results: [],
-    geom: null
+    geom: null,
+    preview: false, // draw the player's line while they type
+    guess: {}       // numbers typed so far this round, by quantity
 };
 
 // ---------- maths ----------
@@ -336,7 +338,49 @@ function draw() {
             ctx.fill();
         }
     }
+
+    // The player's line: while typing when the preview is on, and after the reveal
+    const g = (state.revealed || state.preview) ? guessLine(state.guess) : null;
+    if (g) {
+        const guessColour = cssVar('--guess');
+        ctx.strokeStyle = guessColour;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([7, 5]);
+        ctx.beginPath();
+        ctx.moveTo(X(r.xr[0]), Y(g.slope * r.xr[0] + g.intercept));
+        ctx.lineTo(X(r.xr[1]), Y(g.slope * r.xr[1] + g.intercept));
+        ctx.stroke();
+        ctx.setLineDash([]);
+        if (state.guess.intercept !== undefined && r.xr[0] <= 0) {
+            ctx.fillStyle = guessColour;
+            ctx.beginPath();
+            ctx.arc(X(0), Y(g.intercept), 4, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+    }
     ctx.restore();
+}
+
+// Line implied by the guesses: a guessed slope alone goes through the centre of the points
+// (as the least-squares line does), a guessed intercept alone joins (0, b) to that centre.
+function guessLine(guess) {
+    const r = state.round;
+    const mx = mean(r.xs);
+    const my = mean(r.ys);
+    let slope = guess.slope;
+    let intercept = guess.intercept;
+    if (slope === undefined && intercept === undefined) {
+        return null;
+    }
+    if (slope === undefined) {
+        if (Math.abs(mx) < 1e-9 * (r.xr[1] - r.xr[0])) {
+            return null;
+        }
+        slope = (my - intercept) / mx;
+    } else if (intercept === undefined) {
+        intercept = my - slope * mx;
+    }
+    return { slope, intercept };
 }
 
 // ---------- scoring ----------
@@ -366,6 +410,10 @@ function score(quantity, guess) {
     return { points: Math.round(100 * Math.max(0, 1 - frac)), errText };
 }
 
+function pointsClass(points) {
+    return points > 60 ? 'good' : points >= 40 ? 'mid' : 'bad';
+}
+
 function trueValue(quantity) {
     const f = state.round.fit;
     return quantity === 'slope' ? f.slope : quantity === 'intercept' ? f.intercept : f.r2;
@@ -387,6 +435,7 @@ function readSetup() {
     const form = $('setup-form');
     state.quantities = [...form.querySelectorAll('input[name=quantity]:checked')]
         .map((input) => input.value);
+    state.preview = $('preview').checked;
     if (state.quantities.length === 0) {
         return 'Pick at least one thing to guess.';
     }
@@ -440,6 +489,7 @@ function nextRound() {
     }
     state.round = makeRound(state.level);
     state.revealed = false;
+    state.guess = {};
     state.roundIndex++;
     $('round-label').textContent = `Round ${state.roundIndex} / ${ROUNDS}`;
     $('score-label').textContent = `Score ${totalScore()}`;
@@ -497,15 +547,20 @@ function submitGuess() {
         const truth = trueValue(q);
         state.results.push({ round: state.roundIndex, quantity: q, truth, guess, errText,
             points });
-        const cls = points >= 50 ? 'good' : 'bad';
+        const cls = pointsClass(points);
         lines.push(`Fitted ${QUANTITIES[q].name}: <strong>${fmt(truth)}</strong> · ` +
             `your guess: ${fmt(guess)} · off by ${errText} · ` +
             `<span class="${cls}">+${points} points</span>`);
         $('guess-' + q).disabled = true;
     }
     state.revealed = true;
+    state.guess = guesses;
     draw();
 
+    if (guessLine(guesses)) {
+        lines.push('<span class="muted">Solid line: least-squares fit. '
+            + 'Dashed line: yours.</span>');
+    }
     fb.innerHTML = lines.join('<br>');
     $('score-label').textContent = `Score ${totalScore()}`;
     $('guess-button').textContent = state.roundIndex >= ROUNDS ? 'See results' : 'Next';
@@ -513,7 +568,8 @@ function submitGuess() {
 }
 
 function bestKey() {
-    return `eyeball.best.${state.quantities.join('+')}.${state.levelKey}`;
+    const preview = state.preview ? '.preview' : '';
+    return `eyeball.best.${state.quantities.join('+')}.${state.levelKey}${preview}`;
 }
 
 function endGame() {
@@ -531,7 +587,7 @@ function endGame() {
         best = undefined; // storage unavailable: just don't show a best score
     }
     const names = state.quantities.map((q) => QUANTITIES[q].name).join(' + ');
-    const label = `${names}, ${state.levelKey}`;
+    const label = `${names}, ${state.levelKey}${state.preview ? ', line shown' : ''}`;
     $('best-score').textContent = best === undefined ? ''
         : best === null || total > best ? `New best for ${label}!`
         : `Your best for ${label}: ${best}`;
@@ -546,6 +602,7 @@ function endGame() {
             td.textContent = v;
             tr.appendChild(td);
         }
+        tr.lastChild.className = pointsClass(r.points);
         body.appendChild(tr);
     }
     state.round = null;
@@ -569,6 +626,19 @@ $('setup-form').addEventListener('input', updateSetupUi);
 $('guess-form').addEventListener('submit', (e) => {
     e.preventDefault();
     submitGuess();
+});
+$('guess-form').addEventListener('input', () => {
+    if (!state.preview || state.revealed) {
+        return;
+    }
+    state.guess = {};
+    for (const q of state.quantities) {
+        const v = parseNumber($('guess-' + q).value);
+        if (Number.isFinite(v)) {
+            state.guess[q] = v;
+        }
+    }
+    draw();
 });
 $('quit').addEventListener('click', () => {
     state.round = null;

@@ -8,7 +8,9 @@
     --accent-hover: #0284c7;
     --border: #334155;
     --good: #4ade80;
+    --mid: #facc15;
     --bad: #f87171;
+    --guess: #c084fc;
 }
 
 * {
@@ -262,11 +264,15 @@ input[type="range"] {
     margin: 0.75rem 0;
 }
 
-.feedback .good {
+.feedback .good, td.good {
     color: var(--good);
 }
 
-.feedback .bad {
+.feedback .mid, td.mid {
+    color: var(--mid);
+}
+
+.feedback .bad, td.bad {
     color: var(--bad);
 }
 

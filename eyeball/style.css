@@ -234,17 +234,27 @@ input[type="range"] {
 }
 
 .guess {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.5rem 1rem;
     margin-top: 1rem;
 }
 
-.guess-row {
+.guess-fields {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 0.25rem;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
 }
 
-.guess-row input {
-    max-width: 220px;
+.guess-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.guess-field input {
+    width: 180px;
 }
 
 .feedback {

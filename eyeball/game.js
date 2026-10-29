@@ -44,9 +44,13 @@ const LEVELS = {
 };
 
 const QUANTITIES = {
-    slope: { name: 'slope', prompt: 'Your estimate of the slope:' },
-    intercept: { name: 'y-intercept', prompt: 'Your estimate of the y-intercept (y at x = 0):' },
-    r2: { name: 'R²', prompt: 'Your estimate of R² (0 to 1):' }
+    slope: { name: 'slope', prompt: 'Your estimate of the slope:', short: 'Slope' },
+    intercept: {
+        name: 'y-intercept',
+        prompt: 'Your estimate of the y-intercept (y at x = 0):',
+        short: 'y-intercept (y at x = 0)'
+    },
+    r2: { name: 'R²', prompt: 'Your estimate of R² (0 to 1):', short: 'R² (0 to 1)' }
 };
 
 const $ = (id) => document.getElementById(id);
@@ -54,7 +58,7 @@ const canvas = $('plot');
 const ctx = canvas.getContext('2d');
 
 const state = {
-    quantity: 'slope',
+    quantities: ['slope'], // what is asked each round: any of the QUANTITIES keys
     levelKey: 'easy',
     level: null,
     roundIndex: 0,
@@ -297,7 +301,7 @@ function draw() {
     const lineAt = (x) => r.fit.slope * x + r.fit.intercept;
 
     // Residuals, shown after an R² guess
-    if (state.revealed && state.quantity === 'r2') {
+    if (state.revealed && state.quantities.includes('r2')) {
         ctx.strokeStyle = 'rgba(248, 113, 113, 0.5)';
         ctx.lineWidth = 1;
         for (let i = 0; i < r.xs.length; i++) {
@@ -325,7 +329,7 @@ function draw() {
         ctx.moveTo(X(r.xr[0]), Y(lineAt(r.xr[0])));
         ctx.lineTo(X(r.xr[1]), Y(lineAt(r.xr[1])));
         ctx.stroke();
-        if (state.quantity === 'intercept' && r.xr[0] <= 0) {
+        if (state.quantities.includes('intercept') && r.xr[0] <= 0) {
             ctx.fillStyle = accent;
             ctx.beginPath();
             ctx.arc(X(0), Y(r.fit.intercept), 5, 0, 2 * Math.PI);
@@ -341,16 +345,16 @@ function slopeAngle(m) {
     return (Math.atan((m * state.geom.pxPerY) / state.geom.pxPerX) * 180) / Math.PI;
 }
 
-function score(guess) {
+function score(quantity, guess) {
     const r = state.round;
     let err;
     let errText;
     let frac;
-    if (state.quantity === 'slope') {
+    if (quantity === 'slope') {
         err = Math.abs(slopeAngle(guess) - slopeAngle(r.fit.slope));
         frac = err / SLOPE_ZERO_DEG;
         errText = err.toFixed(1) + '°';
-    } else if (state.quantity === 'intercept') {
+    } else if (quantity === 'intercept') {
         err = Math.abs(guess - r.fit.intercept);
         frac = err / (INTERCEPT_ZERO_FRAC * (r.yr[1] - r.yr[0]));
         errText = fmt(err);
@@ -362,10 +366,9 @@ function score(guess) {
     return { points: Math.round(100 * Math.max(0, 1 - frac)), errText };
 }
 
-function trueValue() {
+function trueValue(quantity) {
     const f = state.round.fit;
-    return state.quantity === 'slope' ? f.slope : state.quantity === 'intercept'
-        ? f.intercept : f.r2;
+    return quantity === 'slope' ? f.slope : quantity === 'intercept' ? f.intercept : f.r2;
 }
 
 // ---------- flow ----------
@@ -382,7 +385,11 @@ function show(id) {
 
 function readSetup() {
     const form = $('setup-form');
-    state.quantity = form.elements.quantity.value;
+    state.quantities = [...form.querySelectorAll('input[name=quantity]:checked')]
+        .map((input) => input.value);
+    if (state.quantities.length === 0) {
+        return 'Pick at least one thing to guess.';
+    }
     state.levelKey = form.elements.level.value;
     const base = LEVELS[state.levelKey];
     if (state.levelKey !== 'custom') {
@@ -436,13 +443,27 @@ function nextRound() {
     state.roundIndex++;
     $('round-label').textContent = `Round ${state.roundIndex} / ${ROUNDS}`;
     $('score-label').textContent = `Score ${totalScore()}`;
-    $('guess-label').textContent = QUANTITIES[state.quantity].prompt;
-    $('guess').value = '';
-    $('guess').disabled = false;
+    const fields = $('guess-fields');
+    fields.innerHTML = '';
+    for (const q of state.quantities) {
+        const div = document.createElement('div');
+        div.className = 'guess-field';
+        const label = document.createElement('label');
+        label.htmlFor = 'guess-' + q;
+        label.textContent = state.quantities.length > 1 ? QUANTITIES[q].short
+            : QUANTITIES[q].prompt;
+        const input = document.createElement('input');
+        input.id = 'guess-' + q;
+        input.type = 'text';
+        input.inputMode = 'decimal';
+        input.autocomplete = 'off';
+        div.append(label, input);
+        fields.appendChild(div);
+    }
     $('guess-button').textContent = 'Guess';
     $('feedback').textContent = '';
     draw();
-    $('guess').focus();
+    fields.querySelector('input').focus();
 }
 
 function submitGuess() {
@@ -450,40 +471,55 @@ function submitGuess() {
         nextRound();
         return;
     }
-    const guess = parseNumber($('guess').value);
     const fb = $('feedback');
-    if (!Number.isFinite(guess)) {
-        fb.innerHTML = '<span class="bad">Please type a number, e.g. 2.5 or -0.3.</span>';
-        return;
-    }
-    if (state.quantity === 'r2' && (guess < 0 || guess > 1)) {
-        fb.innerHTML = '<span class="bad">R² is between 0 and 1.</span>';
-        return;
+    const guesses = {};
+    for (const q of state.quantities) {
+        const guess = parseNumber($('guess-' + q).value);
+        const name = QUANTITIES[q].name;
+        if (!Number.isFinite(guess)) {
+            fb.innerHTML = `<span class="bad">Please type a number for the ${name}, `
+                + 'e.g. 2.5 or -0.3.</span>';
+            $('guess-' + q).focus();
+            return;
+        }
+        if (q === 'r2' && (guess < 0 || guess > 1)) {
+            fb.innerHTML = '<span class="bad">R² is between 0 and 1.</span>';
+            $('guess-' + q).focus();
+            return;
+        }
+        guesses[q] = guess;
     }
 
-    const { points, errText } = score(guess);
-    const truth = trueValue();
-    state.results.push({ truth, guess, errText, points });
+    const lines = [];
+    for (const q of state.quantities) {
+        const guess = guesses[q];
+        const { points, errText } = score(q, guess);
+        const truth = trueValue(q);
+        state.results.push({ round: state.roundIndex, quantity: q, truth, guess, errText,
+            points });
+        const cls = points >= 50 ? 'good' : 'bad';
+        lines.push(`Fitted ${QUANTITIES[q].name}: <strong>${fmt(truth)}</strong> · ` +
+            `your guess: ${fmt(guess)} · off by ${errText} · ` +
+            `<span class="${cls}">+${points} points</span>`);
+        $('guess-' + q).disabled = true;
+    }
     state.revealed = true;
     draw();
 
-    const name = QUANTITIES[state.quantity].name;
-    const cls = points >= 50 ? 'good' : 'bad';
-    fb.innerHTML = `Fitted ${name}: <strong>${fmt(truth)}</strong> · your guess: ${fmt(guess)}` +
-        ` · off by ${errText}<br><span class="${cls}">+${points} points</span>`;
+    fb.innerHTML = lines.join('<br>');
     $('score-label').textContent = `Score ${totalScore()}`;
-    $('guess').disabled = true;
     $('guess-button').textContent = state.roundIndex >= ROUNDS ? 'See results' : 'Next';
     $('guess-button').focus();
 }
 
 function bestKey() {
-    return `eyeball.best.${state.quantity}.${state.levelKey}`;
+    return `eyeball.best.${state.quantities.join('+')}.${state.levelKey}`;
 }
 
 function endGame() {
     const total = totalScore();
-    $('final-score').textContent = `${total} / ${ROUNDS * 100} points`;
+    const all = state.quantities.length > 1;
+    $('final-score').textContent = `${total} / ${ROUNDS * 100 * state.quantities.length} points`;
 
     let best = null;
     try {
@@ -494,22 +530,24 @@ function endGame() {
     } catch (e) {
         best = undefined; // storage unavailable: just don't show a best score
     }
-    const label = `${QUANTITIES[state.quantity].name}, ${state.levelKey}`;
+    const names = state.quantities.map((q) => QUANTITIES[q].name).join(' + ');
+    const label = `${names}, ${state.levelKey}`;
     $('best-score').textContent = best === undefined ? ''
         : best === null || total > best ? `New best for ${label}!`
         : `Your best for ${label}: ${best}`;
 
     const body = $('summary').querySelector('tbody');
     body.innerHTML = '';
-    state.results.forEach((r, i) => {
+    for (const r of state.results) {
         const tr = document.createElement('tr');
-        for (const v of [i + 1, fmt(r.truth), fmt(r.guess), r.errText, r.points]) {
+        const round = all ? `${r.round} · ${QUANTITIES[r.quantity].name}` : r.round;
+        for (const v of [round, fmt(r.truth), fmt(r.guess), r.errText, r.points]) {
             const td = document.createElement('td');
             td.textContent = v;
             tr.appendChild(td);
         }
         body.appendChild(tr);
-    });
+    }
     state.round = null;
     show('end');
 }

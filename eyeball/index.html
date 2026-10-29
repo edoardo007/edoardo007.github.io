@@ -18,7 +18,7 @@
             <p class="bio">
                 Each round shows a random scatter plot. Estimate one property of its
                 least-squares line by eye, type it in, and see how close you got.
-                Five rounds per game, up to 100 points each.
+                Five rounds per game, up to 100 points per estimate.
             </p>
         </header>
 
@@ -26,13 +26,13 @@
         <section id="setup" class="card">
             <form id="setup-form">
                 <fieldset>
-                    <legend>What to guess</legend>
+                    <legend>What to guess <span class="muted">(pick one or more)</span></legend>
                     <div class="pills">
-                        <label><input type="radio" name="quantity" value="slope" checked>
+                        <label><input type="checkbox" name="quantity" value="slope" checked>
                             <span>Slope</span></label>
-                        <label><input type="radio" name="quantity" value="intercept">
+                        <label><input type="checkbox" name="quantity" value="intercept">
                             <span>y-intercept</span></label>
-                        <label><input type="radio" name="quantity" value="r2">
+                        <label><input type="checkbox" name="quantity" value="r2">
                             <span>R²</span></label>
                     </div>
                 </fieldset>
@@ -110,11 +110,8 @@
             </div>
             <canvas id="plot" aria-label="Scatter plot of the current round"></canvas>
             <form id="guess-form" class="guess">
-                <label for="guess" id="guess-label"></label>
-                <div class="guess-row">
-                    <input id="guess" type="text" inputmode="decimal" autocomplete="off">
-                    <button type="submit" id="guess-button" class="btn primary">Guess</button>
-                </div>
+                <div id="guess-fields" class="guess-fields"></div>
+                <button type="submit" id="guess-button" class="btn primary">Guess</button>
             </form>
             <p id="feedback" class="feedback" role="status"></p>
             <button type="button" id="quit" class="btn small">Quit</button>

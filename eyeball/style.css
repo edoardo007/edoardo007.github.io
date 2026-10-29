@@ -1,0 +1,310 @@
+/* Colours and type follow the main page (../index.html). */
+:root {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-hover: #0284c7;
+    --border: #334155;
+    --good: #4ade80;
+    --bad: #f87171;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+}
+
+.back {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.back:hover {
+    color: var(--accent);
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--accent);
+    padding-left: 0.75rem;
+}
+
+.subtitle {
+    font-size: 1.25rem;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.bio, .muted, .help {
+    color: var(--text-muted);
+}
+
+.help {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+}
+
+fieldset {
+    border: none;
+    margin-bottom: 1.25rem;
+}
+
+legend {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Radio buttons shown as pills */
+.pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.pills input {
+    position: absolute;
+    opacity: 0;
+}
+
+.pills span {
+    display: inline-block;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pills span:hover {
+    border-color: var(--accent);
+}
+
+.pills input:checked + span {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.pills input:focus-visible + span {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+    max-width: 320px;
+}
+
+input[type="text"] {
+    background: var(--bg-color);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    width: 100%;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+input[type="range"] {
+    accent-color: var(--accent);
+    width: 100%;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: var(--card-bg);
+    color: var(--text-main);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.btn.primary {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg-color);
+    font-weight: 600;
+}
+
+.btn.primary:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: var(--text-main);
+}
+
+.btn.small {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.8rem;
+}
+
+.error {
+    color: var(--bad);
+    min-height: 1.6em;
+    font-size: 0.9rem;
+}
+
+.how {
+    margin-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.how summary {
+    cursor: pointer;
+    color: var(--text-main);
+}
+
+.how ul {
+    margin: 0.5rem 0 0 1.25rem;
+}
+
+.how li {
+    margin-bottom: 0.4rem;
+}
+
+/* Game */
+.status {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+#plot {
+    display: block;
+    width: 100%;
+    background: var(--bg-color);
+    border-radius: 6px;
+}
+
+.guess {
+    margin-top: 1rem;
+}
+
+.guess-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.guess-row input {
+    max-width: 220px;
+}
+
+.feedback {
+    min-height: 3.2em;
+    margin: 0.75rem 0;
+}
+
+.feedback .good {
+    color: var(--good);
+}
+
+.feedback .bad {
+    color: var(--bad);
+}
+
+/* End */
+.final {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
+}
+
+th, td {
+    text-align: right;
+    padding: 0.35rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+th:first-child, td:first-child {
+    text-align: left;
+}
+
+th {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.end-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    table {
+        font-size: 0.85rem;
+    }
+
+    th, td {
+        padding: 0.3rem 0.25rem;
+    }
+}

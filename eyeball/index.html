@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eyeball the Fit | Edoardo Marelli</title>
+    <meta name="description"
+          content="A small game for scientists: guess the slope, intercept or R² of a scatter plot.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <a href="../" class="back">&larr; edoardomarelli.it</a>
+            <h1>Eyeball the Fit</h1>
+            <p class="subtitle">How good is your built-in least-squares solver?</p>
+            <p class="bio">
+                Each round shows a random scatter plot. Estimate one property of its
+                least-squares line by eye, type it in, and see how close you got.
+                Five rounds per game, up to 100 points each.
+            </p>
+        </header>
+
+        <!-- Setup -->
+        <section id="setup" class="card">
+            <form id="setup-form">
+                <fieldset>
+                    <legend>What to guess</legend>
+                    <div class="pills">
+                        <label><input type="radio" name="quantity" value="slope" checked>
+                            <span>Slope</span></label>
+                        <label><input type="radio" name="quantity" value="intercept">
+                            <span>y-intercept</span></label>
+                        <label><input type="radio" name="quantity" value="r2">
+                            <span>R²</span></label>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Level</legend>
+                    <div class="pills">
+                        <label><input type="radio" name="level" value="easy" checked>
+                            <span>Easy</span></label>
+                        <label><input type="radio" name="level" value="medium">
+                            <span>Medium</span></label>
+                        <label><input type="radio" name="level" value="hard">
+                            <span>Hard</span></label>
+                        <label><input type="radio" name="level" value="custom">
+                            <span>Custom</span></label>
+                    </div>
+                    <p id="level-help" class="help"></p>
+                </fieldset>
+
+                <fieldset id="custom-options" hidden>
+                    <legend>Custom</legend>
+                    <div class="field">
+                        <label for="xmin">Smallest x</label>
+                        <input id="xmin" type="text" inputmode="decimal" value="0"
+                               autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="width">Width of the x range</label>
+                        <input id="width" type="text" inputmode="decimal" value="10"
+                               autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="dx">x step Δx</label>
+                        <input id="dx" type="text" inputmode="decimal" value="0.5"
+                               autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="noise">Noise <span id="noise-value" class="muted"></span></label>
+                        <input id="noise" type="range" min="0" max="100" step="1" value="20">
+                    </div>
+                    <p class="help">
+                        Each round, the first point lands at the smallest x plus up to 5 % of
+                        the width. Noise is the standard deviation of the scatter, as a
+                        percentage of how much the line rises or falls over the x range. 0 %
+                        puts every point on the line.
+                    </p>
+                </fieldset>
+
+                <p id="setup-error" class="error" role="alert"></p>
+                <button type="submit" class="btn primary">Start</button>
+            </form>
+
+            <details class="how">
+                <summary>How is it scored?</summary>
+                <ul>
+                    <li>The answer is the ordinary least-squares line through the points
+                        shown, not the hidden line they were generated from.</li>
+                    <li><strong>Slope</strong> is scored by the angle the line makes on
+                        screen: full marks if you match it, zero at 15° off. Steep axes or
+                        huge numbers are no harder than small ones.</li>
+                    <li><strong>y-intercept</strong>: zero points once you are off by 10 % of
+                        the plotted y range. On Easy, Medium and Hard the data start away from
+                        x = 0, so you have to extrapolate: further on harder levels.</li>
+                    <li><strong>R²</strong> is the fraction of the variance in y explained by
+                        the line (1 = all points on it). Zero points once you are 0.2 off.</li>
+                </ul>
+            </details>
+        </section>
+
+        <!-- Game -->
+        <section id="game" class="card" hidden>
+            <div class="status">
+                <span id="round-label"></span>
+                <span id="score-label"></span>
+            </div>
+            <canvas id="plot" aria-label="Scatter plot of the current round"></canvas>
+            <form id="guess-form" class="guess">
+                <label for="guess" id="guess-label"></label>
+                <div class="guess-row">
+                    <input id="guess" type="text" inputmode="decimal" autocomplete="off">
+                    <button type="submit" id="guess-button" class="btn primary">Guess</button>
+                </div>
+            </form>
+            <p id="feedback" class="feedback" role="status"></p>
+            <button type="button" id="quit" class="btn small">Quit</button>
+        </section>
+
+        <!-- End -->
+        <section id="end" class="card" hidden>
+            <h2>Game over</h2>
+            <p id="final-score" class="final"></p>
+            <p id="best-score" class="muted"></p>
+            <table id="summary">
+                <thead>
+                    <tr><th>Round</th><th>Fitted</th><th>Your guess</th><th>Error</th>
+                        <th>Points</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="end-buttons">
+                <button type="button" id="again" class="btn primary">Play again</button>
+                <button type="button" id="change" class="btn">Change settings</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
